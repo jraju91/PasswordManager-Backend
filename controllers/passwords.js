@@ -1,7 +1,7 @@
 import express from "express";
 import mongoose from "mongoose";
 const router = express.Router();
-import Password from '../models/password'
+import Password from '../../PasswordManager-Backend/models/password.js'
 
 export const getPasswords = async (req, res) =>{
     try{
@@ -28,6 +28,7 @@ export const getPassword = async (req, res) =>{
 
 export const createPassword = async (req, res) => {
     const password = req.body;
+    console.log(req.body)
     const newPassword = new Password({...password, creator: req.userId, createdAt: new Date().toISOString()})
     try{
         await newPassword.save();
@@ -49,7 +50,7 @@ export const updatePassword = async (req, res) =>{
 
     await Password.findByIdAndUpdate(id, updatedPassword, { new: true });
 
-    res.json(updatedRecipe);
+    res.json(updatedPassword);
 }
 
 export const deletePassword = async (req, res) =>{

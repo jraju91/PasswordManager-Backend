@@ -1,12 +1,10 @@
-const YelpApp = require('../models/yelp-model')
+import Password from '../../PasswordManager-Backend/models/password.js'
 
-import Password from '../models/password'
-
-import PasswordData from './password-seeds.json'
+import PasswordData from '../../PasswordManager-Backend/db/password-seeds.json' assert {type: 'json'}
 
 Password.deleteMany({})
 .then( () => {
-    return PasswordData.insertMany(passwordData)
+    return Password.insertMany(PasswordData)
 })
 .then(console.log)
 .catch(console.error)

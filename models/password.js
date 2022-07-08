@@ -1,11 +1,26 @@
-import mongoose from 'mongoose'
+import mongoose from '../../PasswordManager-Backend/db/connection.js'
 
 
 const passwordSchema = mongoose.Schema({
+
+
+        nameofwebsite: {
+                
+                type: String,
+                required: true
+            },
         
-        nameofwebsite: String,
-        username: String,
-        password: String,
+    
+        username: {
+            type: String,
+            required: true
+        },
+        password: {
+            
+            type: String,
+            required: true
+        },
+
         linktoreset: String,
     
 });
