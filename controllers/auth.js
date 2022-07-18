@@ -64,11 +64,15 @@ export const updateUser = async (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(id))
     return res.status(404).send(`No user with id: ${id}`);
 
-  const updatedUser = { firstname, lastname, email, password, _id: id };
+  //   const updatedUser = { firstname, lastname, email, password: hash, _id: id };
 
-  await User.findByIdAndUpdate(id, updatedUser, { new: true });
+  bcrypt.hash(password, 10).then(async (hash) => {
+    const updatedUser = { firstname, lastname, email, password: hash, _id: id };
+    await User.findByIdAndUpdate(id, updatedUser, { new: true });
+    console.log(password);
 
-  res.json(updatedUser);
+    res.json(updatedUser);
+  });
 };
 
 export const deleteUser = async (req, res) => {
@@ -96,13 +100,9 @@ export const login = async (req, res, next) => {
     .then(function (result) {
       if (result) {
         const maxAge = 3 * 60 * 60;
-        const token = jwt.sign(
-          { id: user._id, username, role: user.role },
-          jwtSecret,
-          {
-            expiresIn: maxAge,
-          }
-        );
+        const token = jwt.sign({ id: user._id, email }, jwtSecret, {
+          expiresIn: maxAge,
+        });
         res.cookie("jwt", token, {
           httpOnly: true,
           maxAge: maxAge * 1000,

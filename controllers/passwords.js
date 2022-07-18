@@ -2,7 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 const router = express.Router();
 import Password from "../../PasswordManager-Backend/models/password.js";
-
+import bcrypt from "bcryptjs";
 export const getPasswords = async (req, res) => {
   console.log(req.userId);
   try {
@@ -26,24 +26,25 @@ export const getPassword = async (req, res) => {
     res.status(404).json({ message: error.message });
   }
 };
-// rehash passwords
+
 export const createPassword = async (req, res) => {
+  // console.log(req.body);
   const password = req.body;
-  console.log(req.body);
-  const newPassword = new Password({
-    ...password,
-    creator: req.userId,
-    createdAt: new Date().toISOString(),
+  bcrypt.hash(password, 10).then(async (hash) => {
+    let newPassword = new Password({
+      ...{ pasword: hash },
+      creator: req.userId,
+      createdAt: new Date().toISOString(),
+    });
+    try {
+      await newPassword.save();
+      res.status(201).json(newPassword);
+    } catch (error) {
+      res.status(409).json({ message: error.message });
+    }
   });
-  try {
-    await newPassword.save();
-    res.status(201).json(newPassword);
-  } catch (error) {
-    res.status(409).json({ message: error.message });
-  }
 };
 
-// rehash passwords
 export const updatePassword = async (req, res) => {
   const { id } = req.params;
 
@@ -51,18 +52,19 @@ export const updatePassword = async (req, res) => {
 
   if (!mongoose.Types.ObjectId.isValid(id))
     return res.status(404).send(`No password with id: ${id}`);
+  bcrypt.hash(password, 10).then(async (hash) => {
+    const updatedPassword = {
+      nameofwebsite,
+      username,
+      password: hash,
+      linktoreset,
+      _id: id,
+    };
 
-  const updatedPassword = {
-    nameofwebsite,
-    username,
-    password,
-    linktoreset,
-    _id: id,
-  };
+    await Password.findByIdAndUpdate(id, updatedPassword, { new: true });
 
-  await Password.findByIdAndUpdate(id, updatedPassword, { new: true });
-
-  res.json(updatedPassword);
+    res.json(updatedPassword);
+  });
 };
 
 export const deletePassword = async (req, res) => {
