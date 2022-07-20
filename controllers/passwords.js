@@ -3,8 +3,9 @@ import mongoose from "mongoose";
 const router = express.Router();
 import Password from "../../PasswordManager-Backend/models/password.js";
 import bcrypt from "bcryptjs";
+
 export const getPasswords = async (req, res) => {
-  console.log(req.userId);
+  // console.log(req.userId);
   try {
     const password = await Password.find();
     console.log(password);
@@ -30,19 +31,21 @@ export const getPassword = async (req, res) => {
 export const createPassword = async (req, res) => {
   // console.log(req.body);
   const password = req.body;
-  bcrypt.hash(password, 10).then(async (hash) => {
-    let newPassword = new Password({
-      ...{ pasword: hash },
-      creator: req.userId,
-      createdAt: new Date().toISOString(),
-    });
-    try {
-      await newPassword.save();
-      res.status(201).json(newPassword);
-    } catch (error) {
-      res.status(409).json({ message: error.message });
-    }
+
+  let newPassword = new Password({
+    username: password.username,
+    nameofwebsite: password.nameofwebsite,
+    password: password.password,
+    linktoreset: password.linktoreset,
+    userId: password.userId,
+    createdAt: new Date().toISOString(),
   });
+  try {
+    await newPassword.save();
+    res.status(201).json(newPassword);
+  } catch (error) {
+    res.status(409).json({ message: error.message });
+  }
 };
 
 export const updatePassword = async (req, res) => {
@@ -52,19 +55,18 @@ export const updatePassword = async (req, res) => {
 
   if (!mongoose.Types.ObjectId.isValid(id))
     return res.status(404).send(`No password with id: ${id}`);
-  bcrypt.hash(password, 10).then(async (hash) => {
-    const updatedPassword = {
-      nameofwebsite,
-      username,
-      password: hash,
-      linktoreset,
-      _id: id,
-    };
 
-    await Password.findByIdAndUpdate(id, updatedPassword, { new: true });
+  const updatedPassword = {
+    nameofwebsite,
+    username,
+    password,
+    linktoreset,
+    _id: id,
+  };
 
-    res.json(updatedPassword);
-  });
+  await Password.findByIdAndUpdate(id, updatedPassword, { new: true });
+
+  res.json(updatedPassword);
 };
 
 export const deletePassword = async (req, res) => {

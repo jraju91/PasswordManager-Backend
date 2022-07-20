@@ -9,8 +9,21 @@ const jwtSecret =
   "d41329a1f1352eda18fd4c521fe5899f3bff023554ea74ad7f77c88a1ca8ea98eaf29f";
 
 export const getUsers = async (req, res) => {
+  console.log("hello");
   try {
-    const user = await User.find();
+    const users = await User.find();
+
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+};
+
+export const getUser = async (req, res) => {
+  console.log("hello");
+  const id = req.params.id;
+  try {
+    const user = await User.findById(id);
 
     res.status(200).json(user);
   } catch (error) {
@@ -56,7 +69,7 @@ export const createUser = async (req, res) => {
 
 // rehash passwords
 export const updateUser = async (req, res) => {
-  console.log("hello");
+  // console.log("hello");
   const { id } = req.params;
 
   const { firstname, lastname, email, password } = req.body;
@@ -69,7 +82,7 @@ export const updateUser = async (req, res) => {
   bcrypt.hash(password, 10).then(async (hash) => {
     const updatedUser = { firstname, lastname, email, password: hash, _id: id };
     await User.findByIdAndUpdate(id, updatedUser, { new: true });
-    console.log(password);
+    // console.log(password);
 
     res.json(updatedUser);
   });
@@ -89,10 +102,17 @@ export const deleteUser = async (req, res) => {
 };
 
 export const login = async (req, res, next) => {
-  const { username, password } = req.body;
-  if (!username || !password) {
+  const { email, password } = req.body;
+  if (!email || !password) {
     return res.status(400).json({
-      message: "Username or Password not present",
+      message: "email or Password not present",
+    });
+  }
+
+  const user = await User.findOne({ email });
+  if (!user) {
+    return res.status(400).json({
+      message: "Email does not exist",
     });
   }
   bcrypt
