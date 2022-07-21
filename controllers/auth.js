@@ -32,11 +32,13 @@ export const getUser = async (req, res) => {
 };
 
 export const createUser = async (req, res) => {
+  console.log("helllo");
   const { firstname, lastname, email, password } = req.body;
-  if (password.length < 6) {
-    return res.status(400).json({ message: "Password less than 6 characters" });
-  }
-  bcrypt.hash(password, 10).then(async (hash) => {
+
+  // if (password.length < 6) {
+  //   return res.status(400).json({ message: "Password less than 6 characters" });
+  // }
+  await bcrypt.hash(password, 10).then(async (hash) => {
     await User.create({
       firstname,
       lastname,
@@ -54,6 +56,7 @@ export const createUser = async (req, res) => {
         });
         res.status(201).json({
           message: "User successfully created",
+
           user: user._id,
         });
       })
@@ -72,7 +75,7 @@ export const updateUser = async (req, res) => {
   // console.log("hello");
   const { id } = req.params;
 
-  const { firstname, lastname, email, password } = req.body;
+  const { firstname, lastname, email, password, websitePasswords } = req.body;
 
   if (!mongoose.Types.ObjectId.isValid(id))
     return res.status(404).send(`No user with id: ${id}`);
@@ -80,7 +83,14 @@ export const updateUser = async (req, res) => {
   //   const updatedUser = { firstname, lastname, email, password: hash, _id: id };
 
   bcrypt.hash(password, 10).then(async (hash) => {
-    const updatedUser = { firstname, lastname, email, password: hash, _id: id };
+    const updatedUser = {
+      firstname,
+      lastname,
+      email,
+      password: hash,
+      websitePasswords,
+      _id: id,
+    };
     await User.findByIdAndUpdate(id, updatedUser, { new: true });
     // console.log(password);
 
@@ -127,9 +137,11 @@ export const login = async (req, res, next) => {
           httpOnly: true,
           maxAge: maxAge * 1000,
         });
+        console.log(token);
         res.status(201).json({
           message: "User successfully Logged in",
           user: user._id,
+          token,
         });
       } else {
         res.status(400).json({ message: "Login not succesful" });

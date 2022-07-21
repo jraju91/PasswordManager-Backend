@@ -1,6 +1,13 @@
-import mongoose from "mongoose";
+import mongoose from "../../PasswordManager-Backend/db/connection.js";
 
-const userSchema = mongoose.Schema({
+const Schema = mongoose.Schema;
+// const websitePasswordsSchema = new Schema({
+//   website: String,
+//   password: String,
+//   username: String,
+// });
+
+const userSchema = new Schema({
   firstname: {
     type: String,
     required: true,
@@ -19,6 +26,8 @@ const userSchema = mongoose.Schema({
     required: true,
     minlength: 6,
   },
+
+  websitePasswords: [{ website: String, password: String, username: String }],
 });
 
 const User = mongoose.model("User", userSchema);

@@ -5,9 +5,14 @@ import Password from "../../PasswordManager-Backend/models/password.js";
 import bcrypt from "bcryptjs";
 
 export const getPasswords = async (req, res) => {
-  // console.log(req.userId);
+  const userId = req.query.userId;
+
   try {
-    const password = await Password.find();
+    // const password = await Password.find({
+    //   user: mongoose.Types.ObjectId(userId),
+    // });
+    const password = await Password.find({ userId });
+    // console.log(userId);
     console.log(password);
 
     res.status(200).json(password);
@@ -27,7 +32,7 @@ export const getPassword = async (req, res) => {
     res.status(404).json({ message: error.message });
   }
 };
-
+// workaround for userId
 export const createPassword = async (req, res) => {
   // console.log(req.body);
   const password = req.body;
