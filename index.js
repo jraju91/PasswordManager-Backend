@@ -2,7 +2,7 @@ import express from "express";
 const app = express();
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import PasswordRoutes from "../PasswordManager-Backend/routes/password.js";
+import PasswordRoutes from "../passwordmanager-backend/routes/password.js";
 import AuthRoutes from "../PasswordManager-Backend/routes/route.js";
 
 // app.use(bodyParser.json({ limit: "30mb", extended: true }))
