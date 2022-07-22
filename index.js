@@ -17,7 +17,9 @@ app.use("/auth", AuthRoutes);
 app.get("/", (req, res) => {
   res.send({ message: "We did it!" });
 });
-
+app.get("/favicon.ico", (req, res) => {
+  res.send({ message: "We did it!" });
+});
 const PORT = 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
