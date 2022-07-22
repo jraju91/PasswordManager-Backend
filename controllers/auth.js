@@ -38,7 +38,8 @@ export const createUser = async (req, res) => {
   // if (password.length < 6) {
   //   return res.status(400).json({ message: "Password less than 6 characters" });
   // }
-  await bcrypt.hash(password, 10).then(async (hash) => {
+  // const salt = await bcrypt.genSalt(10);
+  bcrypt.hash(password, 10).then(async (hash) => {
     await User.create({
       firstname,
       lastname,
@@ -54,6 +55,7 @@ export const createUser = async (req, res) => {
           httpOnly: true,
           maxAge: maxAge * 1000,
         });
+        // redirect to login function
         res.status(201).json({
           message: "User successfully created",
 
